@@ -1,3 +1,5 @@
+<uses-permission android:name="android.permission.SEND_SMS" /> //Add in manifest.xml
+
 try {
             SmsManager smsManager = SmsManager.getDefault();
             ArrayList<String> parts = smsManager.divideMessage(data);
