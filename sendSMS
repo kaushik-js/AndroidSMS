@@ -1,0 +1,37 @@
+try {
+            SmsManager smsManager = SmsManager.getDefault();
+            ArrayList<String> parts = smsManager.divideMessage(data);
+            PendingIntent sentIntent = PendingIntent.getBroadcast(this, 0, new Intent("SMS_SENT"), PendingIntent.FLAG_IMMUTABLE);
+            registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    int resultCode = getResultCode();
+                    switch (resultCode) {
+                        case Activity.RESULT_OK:
+                            Toast.makeText(context, "SMS sent!", Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                            Toast.makeText(context, "Generic failure!", Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_NO_SERVICE:
+                            Toast.makeText(context, "No service!", Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_NULL_PDU:
+                            Toast.makeText(context, "Null PDU!", Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_RADIO_OFF:
+                            Toast.makeText(context, "Radio off!", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }, new IntentFilter("SMS_SENT"));
+            
+             for (String msg : parts) {
+               smsManager.sendTextMessage(phoneNumber, null, msg, sentIntent, null);
+             }
+       
+
+        } catch (Exception e) {
+            Toast.makeText(this, "SMS sending failed!", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
