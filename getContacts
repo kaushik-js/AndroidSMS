@@ -1,0 +1,44 @@
+//Get contacts from local phone
+
+<uses-permission android:name="android.permission.READ_CONTACTS" /> // Add in manifest
+
+Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_SELECT_CONTACT) {
+            if (resultCode == Activity.RESULT_OK) {
+                Uri contactUri = data.getData();
+                String contactId = contactUri.getLastPathSegment();
+                Cursor cursor = getContentResolver().query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                        new String[]{contactId},
+                        null
+                );
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    int nameColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                    int phoneNumberColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
+                    String contactName = cursor.getString(nameColumnIndex);
+                    String phoneNumber = cursor.getString(phoneNumberColumnIndex);
+                    String contactInfo = contactName + " : " + phoneNumber+"\n";
+                    //use contactInfo in our logic
+
+                } else {
+                    Toast.makeText(this, "Unable to retrieve contact details.", Toast.LENGTH_SHORT).show();
+                }
+
+                if (cursor != null) {
+                    cursor.close();
+                }
+            } else {
+                Toast.makeText(this, "Contact selection canceled.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
